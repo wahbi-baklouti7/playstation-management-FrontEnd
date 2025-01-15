@@ -1,28 +1,28 @@
-import { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import './App.css'
 import Login from './pages/Auth/Login'
-import Home from './pages/Home'
 import AuthProvider from './context/AuthProvider'
-import PrivateRoute from './router/PrivateRoute'
 import LayoutA from './components/Layout'
+import AppRoutes from './router/AppRoutes'
+import NotFound from './components/NotFound'
 
 function App() {
 
   return (
     <Router>
       <AuthProvider>
-      <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route element={<PrivateRoute />} >
-            <Route path="/" element={<Home />} />
+        <Routes>
+           <Route path="/login" element={<Login />} /> 
+            <Route  element={<LayoutA />}>
+            <Route path="/*" element={<AppRoutes />} />            
           </Route>
-          <Route path ="/layout" element={<LayoutA/>} />
-
-      </Routes>
+          <Route path="/404" element={<NotFound />} />
+          <Route path="*"  element={<NotFound />} />
+          {/* </Route> */}
+        </Routes>
       </AuthProvider>
-     
     </Router>
+
   )
 }
 
