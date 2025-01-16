@@ -11,6 +11,8 @@ import { useGames } from "../../context/GamesContext";
 import { useDevices } from "../../context/DevicesContext";
 import Badge from "react-bootstrap/Badge";
 import { useSessions } from "../../context/SessionsContext";
+import echo from "../../echo";
+import { use } from "react";
 
 const SessionCard = ({ device }) => {
   const { user } = useAuth();
@@ -24,6 +26,7 @@ const SessionCard = ({ device }) => {
   const [gamesCounter, setGamesCounter] = useState(0);
   const [extraTimeCounter, setExtraTimeCounter] = useState(0);
   const [selectedGame, setSelectedGame] = useState(null);
+  const [sessionGame, setSessionGame] = useState(null);
 
   const [session, setSession] = useState({
     device_id: device.id,
@@ -36,6 +39,15 @@ const SessionCard = ({ device }) => {
   // =========================================================================
 
 
+
+  useEffect(() => {
+    console.log("selectedGame3: " + selectedGame);
+    console.log("sessionGame: " + sessionGame);
+    console.log("device: " + device);
+    console.log("is start session: " + isStartSession);
+    console.log("is end session: " + isEndSession);
+
+  }, []);
 
 
   const resetSession = () => {
@@ -59,6 +71,7 @@ const SessionCard = ({ device }) => {
   };
 
   const calculateSessionTotal = () => {
+    console.log("selectedGame1: "+ selectedGame);
     if (selectedGame) {
       return (
         (selectedGame.price * gamesCounter) +
@@ -70,6 +83,8 @@ const SessionCard = ({ device }) => {
   };
 
   const handleEndSession = () => {
+    console.log("selectedGame2: "+ selectedGame);
+
     const total = calculateSessionTotal();
     setSession((prev) => {
       const updatedSession = {
@@ -81,12 +96,13 @@ const SessionCard = ({ device }) => {
       // setSessions((prev) => [ updatedSession,...prev]);
       return updatedSession;
     });
-    // resetSession()
-    // setSelectedGame(null)
+    setSessionGame(selectedGame);
+    setSelectedGame(null)
+    setIsStartSession(false);
     handleUpdateDeviceStatus(device.id);
-    setIsStartSession(!isStartSession);
+    // setIsStartSession(!isStartSession);
     setIsEndSession(!isEndSession);
-    // setSelectedGame(null)
+   
   };
   const toggleStartSession = async () => {
     handleUpdateDeviceStatus(device.id);
@@ -118,8 +134,8 @@ const SessionCard = ({ device }) => {
       className="position-relative"
       style={{ width: 400 }}
     >
-      <Badge bg={device.is_active ? "success" : "secondary"}>
-        <span className="fs-6">{device.is_active ? "Active" : "Inactive"}</span>
+      <Badge bg={device.is_active ? "danger" : "success"}>
+        <span className="fs-6">{device.is_active ? "Busy" : "Free"}</span>
       </Badge>
 
       <h4 className=" text-center">{device.name}</h4>
@@ -142,12 +158,12 @@ const SessionCard = ({ device }) => {
           totalAmount={session?.amount}
           gamesCounter={gamesCounter}
           extraTimeCounter={extraTimeCounter}
-          game={selectedGame}
+          game={sessionGame}
           onClose={handleCloseBtn}
         />
       ) : null}
 
-      {!isStartSession ? (
+      {!isStartSession  ? (
         <Button
           className="mt-4"
           type="primary"

@@ -13,7 +13,6 @@ const devicesContext = createContext();
 const DevicesProvider = ({ children }) => {
   const [devices, setDevices] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isDeviceActive, setIsDeviceActive] = useState(false);
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -35,22 +34,6 @@ const DevicesProvider = ({ children }) => {
     setDevices(updatedDevices);
   };
 
-  // const addDevice = () => {
-  //     createDevice(values).then((res) => {
-  //         if (res.status) {
-  //             setDevices((prev) => [...prev, res.data]);
-  //             setIsModalOpen(false);
-  //         } else {
-  //             form.setFields([
-  //                 {
-  //                     name: 'name',
-  //                     errors: [res.message],
-  //                 },
-  //             ])
-  //         }
-
-  //     });
-  // }
 
   const handleAddDevice = async (values) => {
     const res = await createDevice(values);
@@ -100,6 +83,17 @@ const DevicesProvider = ({ children }) => {
     }
   };
 
+  const handleUpdateDeviceStatus2 =  (device) => {
+    // const response = await changeDeviceStatus(deviceId);
+
+    // if (response.status) {
+    console.log("websockets" + device.is_active);
+      setDevices((prev) =>
+        prev.map((d) => (d.id == device.id ? { ...d, is_active: device.is_active }: d))
+      );
+    // }
+  };
+
   return (
     <devicesContext.Provider
       value={{
@@ -111,6 +105,7 @@ const DevicesProvider = ({ children }) => {
         handleAddDevice,
               handleUpdateDevice,
         handleUpdateDeviceStatus,
+        handleUpdateDeviceStatus2
       }}
     >
       {children}
