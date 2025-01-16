@@ -6,7 +6,7 @@ import { useUsers } from "../../context/UsersContext";
 const UserForm = ({ user = null, setUsers, setIsModalOpen }) => {
   // const [form] = Form.useForm();
 
-  console.log(user.name);
+  // console.log(user.name);
   const isUpdate = user != null;
   
   const { handleAddUser,handleUpdateUser,form } = useUsers()
@@ -24,7 +24,8 @@ const UserForm = ({ user = null, setUsers, setIsModalOpen }) => {
         confirmPassword: '',
       });
     }
-  }, [user.id, form]);
+  // }, [user.id  , form]);
+}, [  form]);
 
   // useEffect(() => {
   //   console.log("use effect");
@@ -41,52 +42,18 @@ const UserForm = ({ user = null, setUsers, setIsModalOpen }) => {
     }
   };
 
-    const onFinish = (values) => {
+  const onFinish = (values) => {
+    console.log('is update: ' + isUpdate);
+      console.log("Success:", values);
     if (!user) {
-      // createUser(values).then((res) => {
-      //   if (res.status) {
-      //     setUsers((prev) => [...prev, res.data]);
-      //     setIsModalOpen(false);
-      //   } else {
-      //       form.setFields(
-      //           Object.keys(res.errors).map((err) => (
-      //               {
-      //                   name: err,
-      //                   errors: [res.errors[err]],
-      //               }
-      //           ))
-                    
-      //             );
-        
-      //   }
-      // });
-      // handleAddUser(values, () => setIsModalOpen(false))
       handleAddUserWithMessage(values)
     } else {
-      // updateUser(user.id, values).then((res) => {
-      //   if (res.status) {
-      //     setUsers((prev) =>
-      //       prev.map((d) => (d.id === res.data.id ? res.data : d))
-      //       );
-            
-      //       setIsModalOpen(false);
-
-           
-            
-      //   } else {
-      //     form.setFields(
-      //         // TODO: refactor this to a method an use it in many places
-      //           Object.keys(res.errors).map((err) => ( 
-      //               {
-      //                   name: err,
-      //                   errors: [res.errors[err]],
-      //               }
-      //           ))
-                    
-      //             );
-
-      //   }
-      // });
+      if (values.password === "") {
+       delete  values.password;
+      }
+      if (values.confirm_password === "") {
+       delete values.confirm_password;
+      }
       handleUpdateUser(user.id,values,() => setIsModalOpen(false))
     }
     };
@@ -107,12 +74,10 @@ const UserForm = ({ user = null, setUsers, setIsModalOpen }) => {
       }}
       initialValues={{
 
-        // remember: true,
         name: user?.name,
         email: user?.email
       }}
       
-      // onReset={() => console.log("reset")}
       onFinish={onFinish}
       
       autoComplete="off"
@@ -134,7 +99,6 @@ const UserForm = ({ user = null, setUsers, setIsModalOpen }) => {
       <Form.Item
         label="Email"
         name="email"
-        // initialValue={user?.email}
         required={false}
         rules={[
           {
@@ -152,10 +116,13 @@ const UserForm = ({ user = null, setUsers, setIsModalOpen }) => {
         required={false}
               rules={[
                   
-                 
+                {
+                  required: !isUpdate,
+                  message: "Please enter your password!",
+                 },
                   {
               
-            required: !isUpdate,
+           
                 message: "Please enter your password!",
                 min: 8,
             
@@ -172,10 +139,13 @@ const UserForm = ({ user = null, setUsers, setIsModalOpen }) => {
         required={false}
         rules={[
           {
-            required:!isUpdate,
-                message: "Please confirm your password!",
-                min: 8,
-            },
+            required: !isUpdate, // Only required if it's not an update
+            message: "Please confirm your password!",
+          },
+          {
+            min: 8,
+            message: "Confirm password must be at least 8 characters!",
+          },
             ({ getFieldValue }) => ({
               validator(_, value) {
                 if (!value || getFieldValue("password") === value) {
