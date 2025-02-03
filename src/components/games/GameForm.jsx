@@ -1,50 +1,25 @@
 import { Button, Form, Input, message } from "antd";
-import React from "react";
-import { createGame, updateGame } from "../../services/GamesServices";
+import React, { useEffect } from "react";
 import { useGames } from "../../context/GamesContext";
 
 const GameForm = ({ game = null, setGames, setIsModalOpen }) => {
-  // const [form] = Form.useForm();
-
-  const { handleAddGame,handleUpdateGame , form} = useGames()
+  const { handleAddGame, handleUpdateGame, form } = useGames()
   
+  useEffect(() => {
+    if (game) {
+      form.setFieldsValue({
+        name: game.name,
+        price: game.price,
+        extra_time_price: game.extra_time_price,
+      });
+    }
+  }, [game])
   const onFinish =async (values) => {
     if (!game) {
-      // TODO: refactor this and move it to context
-      // createGame(values).then((res) => {
-      //   if (res.status) {
-      //     // setGames((prev) => [...prev, res.data]);
-      //     addGame(res.data)
-      //     setIsModalOpen(false);
-      //   } else {
-      //     form.setFields([
-      //       {
-      //         name: "name",
-      //         errors: [res.message],
-      //       },
-      //     ]);
-      //   }
-      // });
-
       await handleAddGame(values)
       setIsModalOpen(false)
       message.success('Game added successfully!');
     } else {
-      // updateGame(game.id, values).then((res) => {
-      //   if (res.status) {
-      //     setGames((prev) =>
-      //       prev.map((d) => (d.id === res.data.id ? res.data : d))
-      //     );
-      //     setIsModalOpen(false);
-      //   } else {
-      //     form.setFields([
-      //       {
-      //         name: "name",
-      //         errors: [res.message],
-      //       },
-      //     ]);
-      //   }
-      // });
       handleUpdateGame(game.id, values)
       setIsModalOpen(false)
       message.success('Game updated successfully!');
@@ -68,8 +43,9 @@ const GameForm = ({ game = null, setGames, setIsModalOpen }) => {
         maxWidth: 600,
       }}
       initialValues={{
-        remember: true,
         name: game?.name,
+        price: game?.price,
+        extra_time_price: game?.extra_time_price
       }}
       onFinish={onFinish}
       autoComplete="off"
@@ -99,34 +75,16 @@ const GameForm = ({ game = null, setGames, setIsModalOpen }) => {
           },
         ]}
       >
-        <Input/>
+        <Input type="number" />
       </Form.Item>
       <Form.Item
+        
         label="Extra Time Price"
         name="extra_time_price"
         initialValue={game?.extra_time_price || 0}
-        // required={false}
-        // rules={[
-        //   {
-        //     required: true,
-        //     message: "Please input your extra time price!",
-        //   },
-        // ]}
       >
-        <Input />
+        <Input type="number" />
       </Form.Item>
-      {/* <Form.Item
-      label="Password"
-      name="password"
-      rules={[
-        {
-          required: true,
-          message: 'Please input your password!',
-        },
-      ]}
-    >
-      <Input.Password />
-    </Form.Item> */}
 
       <Form.Item wrapperCol={{}}>
         <Button type="primary" htmlType="submit" block>
