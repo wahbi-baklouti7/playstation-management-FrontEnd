@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { Button, Input, message, Popconfirm, Space, Table, Tag } from "antd";
-import { getAllSessions } from "../services/SessionsService";
+import React from "react";
+import { Button, message, Popconfirm, Space, Table, Tag } from "antd";
 import { formatMoney } from "../lib/formatMoney";
-import { getAllUsers } from "../services/UsersService";
 import { useSessions } from "../context/SessionsContext";
 import { useUsers } from "../context/UsersContext";
 import { formateDateAndTime } from "../lib/formateDate";
@@ -10,10 +8,8 @@ import { BsTrash } from "react-icons/bs";
 const { Column } = Table;
 
 const Sessions = () => {
-  const [sessionss, setSessions] = useState([]);
 
 
-  const [searchText, setSearchText] = useState("");
   const { sessions,isLoading,tableParams,setTableParams,handleDeleteBtn,fetchSessions } = useSessions();
 
 
@@ -33,9 +29,7 @@ const Sessions = () => {
     key: session.id,
   }));
 
-  // useEffect(() => {
-  //   fetchSessions(tableParams.pagination.current, tableParams.pagination.pageSize);
-  // }, [])
+
 
   const userFilters = users.map((user) => ({
     text: user.name,
@@ -85,6 +79,28 @@ const Sessions = () => {
       key: "created_at",
       align: "center",
       render: (text) => <span>{formateDateAndTime(text)}</span>,
+    },
+    {
+      title: "Duration (minutes)",
+      key: "duration",
+      align: "center",
+      render: (_, record) =>
+      {
+        const { start_time, end_time } = record;
+        // Convert start_time and end_time to Date objects
+      const startDate = new Date(start_time);
+      const endDate = new Date(end_time);
+
+      // Calculate the difference in milliseconds
+      const durationMs = endDate - startDate;
+        // Convert milliseconds to minutes
+        const durationMinutes = durationMs / 1000 / 60;
+
+        console.log("render", durationMinutes);
+       return  <span>{ durationMinutes <1 ? durationMinutes.toFixed(2) : durationMinutes.toFixed(0)}</span>;
+      },
+        
+        
     },
     {
       title: "Action",

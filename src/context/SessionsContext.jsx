@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { deleteSession, getAllSessions } from "../services/SessionsService";
+import { createSession, deleteSession, getAllSessions } from "../services/SessionsService";
 
 
 
@@ -20,7 +20,6 @@ const SessionsProvider = ({ children }) => {
     useEffect(() => {
 
         fetchSessions(tableParams.pagination.current, tableParams.pagination.pageSize); 
-    // console.log("!!!!!!!!!!!!!!! useEffect sessions contest ")
 
     }, [tableParams.pagination.current,
         tableParams.pagination.pageSize,
@@ -30,8 +29,6 @@ const SessionsProvider = ({ children }) => {
     const fetchSessions = async (page, pageSize) => {
         setIsLoading(true);
         const result = await getAllSessions(page, pageSize);
-        // console.log("context " + result.data);
-        // console.log("context total " + result.total);
         setIsLoading(false);
         setSessions(result.data);
         setSessionTotal(result.total)
@@ -44,20 +41,14 @@ const SessionsProvider = ({ children }) => {
           });
     
     }
-    // const loadSessions = async () => {
-    //     setIsLoading(true);
-    //     const s = await getAllSessions(tableParams.pagination.current, tableParams.pagination.pageSize);
-    //     setTableParams({
-    //       ...tableParams,
-    //       pagination: {
-    //         ...tableParams.pagination,
-    //         total: s.total,
-    //       },
-    //     });
-    //     setSessions(s.data);
-    //     setIsLoading(false);
-  //   }
-  
+
+  const handleAddSession = (newSession) => {
+     
+    createSession(newSession).then((res) => {
+      if (res.status) {
+        setSessions((prev) => [ res.data,...prev]);
+      }
+    })  }
   const handleDeleteBtn = async (id) => {
 
     deleteSession(id).then((res) => {
@@ -76,6 +67,7 @@ const SessionsProvider = ({ children }) => {
         isLoading,
         fetchSessions,
       setTableParams,
+      handleAddSession,
       handleDeleteBtn,
       setSessions
 

@@ -2,7 +2,6 @@ import { Button, Card } from "antd";
 import React, { useEffect, useState } from "react";
 
 import { useAuth } from "../../context/AuthProvider";
-import { createSession } from "../../services/SessionsService";
 import { formateDateAndTime } from "../../lib/formateDate";
 import SessionSummary from "./SessionSummary";
 import GameSelect from "./GameSelect";
@@ -11,16 +10,13 @@ import { useGames } from "../../context/GamesContext";
 import { useDevices } from "../../context/DevicesContext";
 import Badge from "react-bootstrap/Badge";
 import { useSessions } from "../../context/SessionsContext";
-import echo from "../../echo";
-import { use } from "react";
 
 const SessionCard = ({ device }) => {
   const { user } = useAuth();
-  // const [games, setGames] = useState([]);
   const { games } = useGames();
   const { handleUpdateDeviceStatus } = useDevices();
+  const {  handleAddSession } = useSessions();
 
-  const {setSessions} = useSessions()
   const [isStartSession, setIsStartSession] = useState(false);
   const [isEndSession, setIsEndSession] = useState(false);
   const [gamesCounter, setGamesCounter] = useState(0);
@@ -46,7 +42,6 @@ const SessionCard = ({ device }) => {
     console.log("device: " + device);
     console.log("is start session: " + isStartSession);
     console.log("is end session: " + isEndSession);
-
   }, []);
 
 
@@ -83,7 +78,6 @@ const SessionCard = ({ device }) => {
   };
 
   const handleEndSession = () => {
-    console.log("selectedGame2: "+ selectedGame);
 
     const total = calculateSessionTotal();
     setSession((prev) => {
@@ -92,8 +86,7 @@ const SessionCard = ({ device }) => {
         amount: total,
         end_time: formateDateAndTime(Date.now()),
       };
-      createSession(updatedSession);
-      // setSessions((prev) => [ updatedSession,...prev]);
+      handleAddSession(updatedSession)
       return updatedSession;
     });
     setSessionGame(selectedGame);
